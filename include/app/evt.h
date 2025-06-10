@@ -1,4 +1,5 @@
 #pragma once
+#include "app/prefs.h"
 
 typedef enum {
     EVT_NO_EVT,

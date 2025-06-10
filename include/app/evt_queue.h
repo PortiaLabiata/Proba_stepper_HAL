@@ -2,8 +2,6 @@
 #include <stdint.h>
 #include "app/evt.h"
 
-#define FSM_QUEUE_LEN   16UL
-
 /* Macros */
 
 #define EVT_IS_LEGAL(__EVT__) ((__EVT__ >= EVT_NO_EVT && __EVT__ <= EVT_REC_FAULTRESET) ? 1 : 0)

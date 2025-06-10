@@ -4,8 +4,6 @@
 #include "app/evt.h"
 #include "app/evt_queue.h"
 
-#define FSM_POOL_SIZE   3UL
-
 /* Macros */
 
 #define FSM_IS_STATE_LEGAL(__STATE__) ((__STATE__ >= STATE_START && __STATE__ <= STATE_FAULT) ? 1 : 0)
@@ -30,6 +28,16 @@ typedef enum {
     FSM_ERR_CB_FAILED
 } fsm_err_t;
 
+typedef enum {
+    MSK_SHUTDOWN =        0B00110,
+    MSK_SWITCHON =        0B00111,
+    MSK_DISABLE_VOLTAGE = 0B00000,
+    MSK_QUICK_STOP =      0B00010,
+    MSK_DISABLE_OP =      0B00111,
+    MSK_ENABLE_OP =       0B01111,
+    MSK_FAULT_RESET =     0B10000
+} ctrl_word_msk_t;
+
 typedef struct FSM *fsm_t;
 
 /* Prototypes */
@@ -38,6 +46,7 @@ fsm_t fsm_create(void);
 uint32_t fsm_get_count(void);
 fsm_err_t fsm_start(fsm_t fsm);
 
+fsm_err_t process_ctrl_word(fsm_t fsm, ctrl_word_msk_t ctrl_word);
 fsm_err_t fsm_handle_evt(fsm_t fsm);
 
 fsm_state_t fsm_get_state(fsm_t fsm);
@@ -51,3 +60,4 @@ __WEAK fsm_err_t fault_reset_callback(void);
 __WEAK fsm_err_t drive_on_callback(void);
 __WEAK fsm_err_t drive_off_callback(void);
 __WEAK fsm_err_t fault_reac_callback(void);
+__WEAK fsm_err_t power_cut_callback(void);

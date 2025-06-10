@@ -6,10 +6,13 @@ struct FSM {
     fsm_state_t state;
     fsm_queue_t queue;
     uint8_t system_online;
+    uint8_t quick_leave_allowed;
 };
 
 static struct FSM _fsm_pool[FSM_POOL_SIZE];
 static uint32_t _fsm_count = 0;
+
+#define push(__EVT__) queue_push(fsm->queue, __EVT__)
 
 /* OOP funcs */
 
@@ -25,9 +28,36 @@ uint32_t fsm_get_count(void) {
 
 fsm_err_t fsm_start(fsm_t fsm) {
     fsm_set_state(fsm, STATE_START);
+
     fsm->system_online = RESET;
+    fsm->quick_leave_allowed = RESET;
+
     queue_push(fsm->queue, EVT_START_UP);
     return FSM_ERR_OK;
+}
+
+fsm_err_t process_ctrl_word(fsm_t fsm, ctrl_word_msk_t ctrl_word) {
+    if (ctrl_word & MSK_SHUTDOWN) {
+        push(EVT_REC_SHUTDOWN);
+    }
+    if (ctrl_word & MSK_SWITCHON) {
+        push(EVT_REC_SWITCHON);
+    }
+    if (ctrl_word & MSK_DISABLE_VOLTAGE) {
+        push(EVT_REC_VOLTAGE_DISABLE);
+    }
+    if (ctrl_word & MSK_QUICK_STOP) {
+        push(EVT_REC_QUICKSTOP);
+    }
+    if (ctrl_word & MSK_DISABLE_OP) {
+        push(EVT_REC_OP_DISABLE);
+    }
+    if (ctrl_word & MSK_ENABLE_OP) {
+        push(EVT_REC_OP_ENABLE);
+    }
+    if (ctrl_word & MSK_FAULT_RESET) {
+        push(EVT_REC_FAULTRESET);
+    }
 }
 
 fsm_err_t fsm_handle_evt(fsm_t fsm) {
@@ -47,8 +77,8 @@ fsm_err_t fsm_handle_evt(fsm_t fsm) {
 
         case EVT_START_UP:
             if (current_state & STATE_START) {
-                fsm_set_state(fsm, STATE_NOT_READY);
                 if (start_up_callback() == FSM_ERR_OK) {
+                    fsm_set_state(fsm, STATE_NOT_READY);
                     queue_push(fsm->queue, EVT_COMMS_ON);
                     goto set_status_ok;
                 }
@@ -57,16 +87,20 @@ fsm_err_t fsm_handle_evt(fsm_t fsm) {
         
         case EVT_COMMS_ON:
             if (current_state & STATE_NOT_READY) {
-                fsm_set_state(fsm, STATE_SWITCH_DISABLED);
                 if (comms_on_callback() == FSM_ERR_OK) {
                     fsm->system_online = SET;
+                    fsm_set_state(fsm, STATE_SWITCH_DISABLED);
                     goto set_status_ok;
                 }
             }
             break;
 
         case EVT_REC_SHUTDOWN:
-            if (current_state & (STATE_SWITCH_DISABLED | STATE_SWITCH_ON | STATE_OP_ENABLED)) {
+            if (current_state & STATE_SWITCH_DISABLED) {
+                fsm_set_state(fsm, STATE_SWITCH_READY);
+                goto set_status_ok;
+            } else if (current_state &  (STATE_SWITCH_ON | STATE_OP_ENABLED)) {
+                power_cut_callback();
                 fsm_set_state(fsm, STATE_SWITCH_READY);
                 goto set_status_ok;
             }
@@ -80,16 +114,27 @@ fsm_err_t fsm_handle_evt(fsm_t fsm) {
             break;
         
         case EVT_REC_VOLTAGE_DISABLE:
-            if (current_state & (STATE_SWITCH_READY | STATE_OP_ENABLED \
-                 | STATE_SWITCH_ON | STATE_QUICK_STOP)) {
+            if (current_state & STATE_SWITCH_READY) {
+                fsm_set_state(fsm, STATE_SWITCH_DISABLED);
+                goto set_status_ok;
+            } else if (current_state & (STATE_OP_ENABLED | STATE_SWITCH_ON | STATE_QUICK_STOP)) {
+                power_cut_callback();
                 fsm_set_state(fsm, STATE_SWITCH_DISABLED);
                 goto set_status_ok;
             }
             break;
         
         case EVT_REC_QUICKSTOP:
-            if (current_state & (STATE_SWITCH_READY | STATE_SWITCH_ON)) {
+            if (current_state & (STATE_SWITCH_READY)) {
                 fsm_set_state(fsm, STATE_SWITCH_DISABLED);
+                goto set_status_ok;
+            } else if (current_state & STATE_SWITCH_ON) {
+                power_cut_callback();
+                fsm_set_state(fsm, STATE_SWITCH_DISABLED);
+                goto set_status_ok;
+            } else if (current_state & STATE_OP_ENABLED) {
+                quick_stop_callback();
+                fsm_set_state(fsm, STATE_QUICK_STOP);
                 goto set_status_ok;
             }
             break;
@@ -105,8 +150,12 @@ fsm_err_t fsm_handle_evt(fsm_t fsm) {
         case EVT_REC_OP_ENABLE:
             // ??
             if (current_state & (STATE_SWITCH_READY | STATE_SWITCH_ON)) {
-                fsm_set_state(fsm, STATE_OP_ENABLED);
                 drive_on_callback();
+                fsm_set_state(fsm, STATE_OP_ENABLED);
+                goto set_status_ok;
+            } else if ((current_state & (STATE_QUICK_STOP)) && fsm->quick_leave_allowed) {
+                drive_on_callback();
+                fsm_set_state(fsm, STATE_OP_ENABLED);
                 goto set_status_ok;
             }
             break;
@@ -172,12 +221,17 @@ fsm_state_t fsm_get_state(fsm_t fsm) {
 
 // Too much overhead?
 fsm_err_t fsm_set_state(fsm_t fsm, fsm_state_t new_state) {
+#if DEBUG_MODE
     if (!FSM_IS_STATE_LEGAL(new_state)) {
         return FSM_ERR_ILLSTATE;
     } else {
         fsm->state = new_state;
         return FSM_ERR_OK;
     }
+#else
+    fsm->state = new_state;
+    return FSM_ERR_OK;
+#endif
 }
 
 uint8_t fsm_is_online(fsm_t fsm) {

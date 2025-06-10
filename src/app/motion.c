@@ -29,3 +29,7 @@ fsm_err_t drive_on_callback(void) {
 fsm_err_t drive_off_callback(void) {
     Stepper_Disable(stp);
 }
+
+fsm_err_t power_cut_callback(void) {
+    Stepper_Disable(stp);
+}

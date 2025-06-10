@@ -12,3 +12,5 @@ extern CANopenNodeSTM32 canOpenNodeSTM32;
 extern CAN_HandleTypeDef hcan;
 extern TIM_HandleTypeDef htim3;
 extern void CAN_Config(void);
+
+/* Typedefs */
