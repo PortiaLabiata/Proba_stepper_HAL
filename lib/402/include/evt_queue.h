@@ -20,6 +20,9 @@ typedef struct fsm_queue *fsm_queue_t;
 
 /* Prototypes */
 
+fsm_queue_t queue_create(void);
+queue_err_t queue_init(fsm_queue_t queue);
+
 queue_err_t queue_push(fsm_queue_t queue, fsm_event_t event);
 queue_err_t queue_pop(fsm_queue_t queue, fsm_event_t *event);
 fsm_event_t queue_peek(fsm_queue_t queue);

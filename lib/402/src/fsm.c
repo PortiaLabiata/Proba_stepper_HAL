@@ -17,8 +17,16 @@ static uint32_t _fsm_count = 0;
 /* OOP funcs */
 
 fsm_t fsm_create(void) {
-    return &_fsm_pool[_fsm_count++];
+    if (_fsm_count < FSM_POOL_SIZE)
+        return &_fsm_pool[_fsm_count++];
+    else return NULL;
 }
+
+#if DEBUG_MODE
+void fsm_exterminate(void) {
+    _fsm_count = 0;
+}
+#endif
 
 uint32_t fsm_get_count(void) {
     return _fsm_count;
@@ -32,6 +40,8 @@ fsm_err_t fsm_start(fsm_t fsm) {
     fsm->system_online = RESET;
     fsm->quick_leave_allowed = RESET;
 
+    fsm->queue = queue_create();
+    queue_init(fsm->queue);
     queue_push(fsm->queue, EVT_START_UP);
     return FSM_ERR_OK;
 }
@@ -242,3 +252,13 @@ fsm_err_t fsm_set_state(fsm_t fsm, fsm_state_t new_state) {
 uint8_t fsm_is_online(fsm_t fsm) {
     return fsm->system_online;
 }
+
+#if DEBUG_MODE
+uint8_t fsm_is_quick_leave(fsm_t fsm) {
+    return fsm->quick_leave_allowed;
+}
+
+fsm_queue_t fsm_get_queue(fsm_t fsm) {
+    return fsm->queue;
+}
+#endif

@@ -1,8 +1,12 @@
 #pragma once
-#include <stm32f103x6.h>
+#include <stdint.h>
 
 #include "evt.h"
 #include "evt_queue.h"
+
+#ifndef __WEAK
+#define __WEAK __attribute__((weak))
+#endif
 
 /* Macros */
 
@@ -50,7 +54,7 @@ fsm_t fsm_create(void);
 uint32_t fsm_get_count(void);
 fsm_err_t fsm_start(fsm_t fsm);
 
-fsm_err_t process_ctrl_word(fsm_t fsm, ctrl_word_msk_t ctrl_word);
+fsm_err_t process_ctrl_word(fsm_t fsm, uint16_t ctrl_word);
 fsm_err_t fsm_handle_evt(fsm_t fsm);
 
 fsm_state_t fsm_get_state(fsm_t fsm);
@@ -65,3 +69,9 @@ __WEAK fsm_err_t drive_on_callback(void);
 __WEAK fsm_err_t drive_off_callback(void);
 __WEAK fsm_err_t fault_reac_callback(void);
 __WEAK fsm_err_t power_cut_callback(void);
+
+#if DEBUG_MODE
+uint8_t fsm_is_quick_leave(fsm_t fsm);
+fsm_queue_t fsm_get_queue(fsm_t fsm);
+void fsm_exterminate(void);
+#endif

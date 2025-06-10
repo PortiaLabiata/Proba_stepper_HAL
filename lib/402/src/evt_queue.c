@@ -9,7 +9,29 @@ struct fsm_queue {
     fsm_event_t *tail;
 };
 
+static struct fsm_queue _queue_pool[FSM_QUEUE_N];
+static uint32_t _queue_count = 0;
+
 /* Queue funcs */
+
+/**
+ * \brief Queue constructor.
+ */
+fsm_queue_t queue_create(void) {
+    if (_queue_count < FSM_QUEUE_N)
+        return &_queue_pool[_queue_count++];
+    else return NULL;
+}
+
+/**
+ * \brief Queue initialization.
+ */
+queue_err_t queue_init(fsm_queue_t queue) {
+    queue->head = queue->queue;
+    queue->tail = queue->queue;
+    queue->event_count = 0;
+    return QUEUE_ERR_OK;
+}
 
 /**
  * \brief Adds an event on top of queue, works like in a ring buffer.
