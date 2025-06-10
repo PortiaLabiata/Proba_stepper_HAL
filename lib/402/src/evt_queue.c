@@ -1,4 +1,4 @@
-#include "app/evt_queue.h"
+#include "evt_queue.h"
 
 /* Typedefs */
 

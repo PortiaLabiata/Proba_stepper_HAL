@@ -1,4 +1,4 @@
-#include "app/fsm.h"
+#include "fsm.h"
 
 /* Typedefs */
 
@@ -36,7 +36,7 @@ fsm_err_t fsm_start(fsm_t fsm) {
     return FSM_ERR_OK;
 }
 
-fsm_err_t process_ctrl_word(fsm_t fsm, ctrl_word_msk_t ctrl_word) {
+fsm_err_t process_ctrl_word(fsm_t fsm, uint16_t ctrl_word) {
     if (ctrl_word & MSK_SHUTDOWN) {
         push(EVT_REC_SHUTDOWN);
     }
@@ -58,6 +58,11 @@ fsm_err_t process_ctrl_word(fsm_t fsm, ctrl_word_msk_t ctrl_word) {
     if (ctrl_word & MSK_FAULT_RESET) {
         push(EVT_REC_FAULTRESET);
     }
+    return FSM_ERR_OK;
+}
+
+fsm_err_t process_status_word(fsm_t fsm, uint16_t status_word) {
+    return FSM_ERR_OK;
 }
 
 fsm_err_t fsm_handle_evt(fsm_t fsm) {

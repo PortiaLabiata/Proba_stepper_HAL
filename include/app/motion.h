@@ -2,7 +2,7 @@
 #include "main.h"
 #include "driver/stepper.h"
 
-#include "app/fsm.h"
+#include "fsm.h"
 #include "CO_app_STM32.h"
 
 /* Global handles */

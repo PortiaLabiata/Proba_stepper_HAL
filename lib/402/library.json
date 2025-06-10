@@ -1,0 +1,8 @@
+{
+    "name": "CIA402",
+    "version": "1.0.0",
+    "description": "CIA402 state machine and eent queue implementaton",
+    "keywords": "CAN, CANOpen, CIA402",
+    "frameworks": "*",
+    "platforms": "*"
+}  

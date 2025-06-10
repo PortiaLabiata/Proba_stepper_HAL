@@ -1,8 +1,8 @@
 #pragma once
-#include "main.h"
+#include <stm32f103x6.h>
 
-#include "app/evt.h"
-#include "app/evt_queue.h"
+#include "evt.h"
+#include "evt_queue.h"
 
 /* Macros */
 
@@ -37,6 +37,10 @@ typedef enum {
     MSK_ENABLE_OP =       0B01111,
     MSK_FAULT_RESET =     0B10000
 } ctrl_word_msk_t;
+
+typedef enum {
+    MSK_STAT_NOT_READY =    0B1000000
+} status_word_msk_t;
 
 typedef struct FSM *fsm_t;
 

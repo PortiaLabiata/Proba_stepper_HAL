@@ -5,7 +5,7 @@
 #include "driver/stepper.h"
 
 #include "CO_app_STM32.h"
-#include "app/fsm.h"
+#include "fsm.h"
 
 TIM_HandleTypeDef htim2, htim3;
 CAN_HandleTypeDef hcan;
