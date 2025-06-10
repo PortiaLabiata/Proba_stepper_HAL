@@ -33,6 +33,13 @@ queue_err_t queue_init(fsm_queue_t queue) {
     return QUEUE_ERR_OK;
 }
 
+#if DEBUG_MODE
+void queue_exterminate(void) {
+    _queue_count = 0;
+}
+#endif
+
+
 /**
  * \brief Adds an event on top of queue, works like in a ring buffer.
  * \param[in] queue Queue object.
@@ -85,3 +92,15 @@ fsm_event_t queue_peek(fsm_queue_t queue) {
 uint32_t queue_get_size(fsm_queue_t queue) {
     return queue->event_count;
 }
+
+#if DEBUG_MODE
+
+fsm_event_t *queue_get_head(fsm_queue_t queue) {
+    return queue->head;
+}
+
+fsm_event_t *queue_get_tail(fsm_queue_t queue) {
+    return queue->tail;
+}
+
+#endif

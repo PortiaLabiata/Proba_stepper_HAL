@@ -14,3 +14,6 @@ typedef enum {
     EVT_REC_VOLTAGE_DISABLE,
     EVT_FAULT_REAC
 } fsm_event_t;
+
+#define EVT_MIN     EVT_NO_EVT
+#define EVT_MAX     EVT_FAULT_REAC
