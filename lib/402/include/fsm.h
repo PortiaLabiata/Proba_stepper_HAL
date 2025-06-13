@@ -29,7 +29,8 @@ typedef enum {
     FSM_ERR_ILLSTATE,
     FSM_ERR_NULLPTR,
     FSM_ERR_NOMEM,
-    FSM_ERR_CB_FAILED
+    FSM_ERR_CB_FAILED,
+    FSM_ERR_ILLTRANS
 } fsm_err_t;
 
 
@@ -46,6 +47,16 @@ typedef enum {
 #define CTRL_QUICK_STOP         (uint16_t)0b00000000
 #define CTRL_ENABLE_OP          (uint16_t)0b00000111
 #define CTRL_FAULT_RESET        (uint16_t)0b10000000
+
+#define MSK_STATUS_WORD         (uint16_t)0b01111111
+#define MSK_ST_SWICH_NOT_READY  (uint16_t)0b00000000
+#define MSK_ST_SWITCH_DISABLED  (uint16_t)0b01000000
+#define MSK_ST_SWITCH_READY     (uint16_t)0b00100001
+#define MSK_ST_SWITCH_ON        (uint16_t)0b00100011
+#define MSK_ST_OP_ENABLED       (uint16_t)0b00100111
+#define MSK_ST_QUICK_STOP       (uint16_t)0b00000111
+#define MSK_ST_FAULT_REAC       (uint16_t)0b00001111
+#define MSK_ST_FAULT            (uint16_t)0b00001000
 
 
 typedef enum {
