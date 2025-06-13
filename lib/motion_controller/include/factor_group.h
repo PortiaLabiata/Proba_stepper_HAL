@@ -5,9 +5,9 @@
 #define STEP_PER_REV      360 * 10 / DEG_PER_STEP10
 #define VEL_SCALE_FACTOR  1
 
-#define DIM_IND_VEL_RPS     (int8_t)0xA3
-#define DIM_IND_VEL_RPM     (int8_t)0xA4
-#define DIM_IND_VEL_RPH     (int8_t)0xA5
+#define DIM_IND_VEL_RPS     (uint8_t)0xA3
+#define DIM_IND_VEL_RPM     (uint8_t)0xA4
+#define DIM_IND_VEL_RPH     (uint8_t)0xA5
 
 #define fuck (int8_t)0xFF;
 
@@ -23,4 +23,4 @@ struct factor_group {
     uint32_t profile_dec;
 };
 
-uint16_t vel2arr(int32_t vel, struct factor_group f);
+uint16_t vel2arr(int32_t vel, struct factor_group *f);
