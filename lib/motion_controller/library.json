@@ -1,0 +1,8 @@
+{
+    "name": "MotionController",
+    "version": "1.0.0",
+    "description": "Motion profile controller for CIA402",
+    "keywords": "CIA402, motion protile",
+    "frameworks": "*",
+    "platforms": "*"
+}  

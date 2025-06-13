@@ -46,26 +46,34 @@ fsm_err_t fsm_start(fsm_t fsm) {
     return FSM_ERR_OK;
 }
 
+fsm_err_t fsm_purge(fsm_t fsm) {
+    fsm->system_online = RESET;
+    fsm->quick_leave_allowed = RESET;
+    queue_init(fsm->queue);
+    return FSM_ERR_OK;
+}
+
 fsm_err_t process_ctrl_word(fsm_t fsm, uint16_t ctrl_word) {
-    if (ctrl_word & MSK_SHUTDOWN) {
+    if (ctrl_word & MSK_SHUTDOWN == CTRL_SHUTDOWN) {
         push(EVT_REC_SHUTDOWN);
     }
-    if (ctrl_word & MSK_SWITCHON) {
-        push(EVT_REC_SWITCHON);
+    if (ctrl_word & MSK_SWON_DISOP == CTRL_SWON_DISOP) {
+        if (fsm_get_state(fsm) == STATE_SWITCH_READY) {
+            push(EVT_REC_SWITCHON);
+        } else if (fsm_get_state(fsm) == STATE_OP_ENABLED) {
+            push(EVT_REC_OP_DISABLE);
+        }
     }
-    if (ctrl_word & MSK_DISABLE_VOLTAGE) {
+    if (ctrl_word & MSK_DISABLE_VOLTAGE == CTRL_DISABLE_VOLTAGE) {
         push(EVT_REC_VOLTAGE_DISABLE);
     }
-    if (ctrl_word & MSK_QUICK_STOP) {
+    if (ctrl_word & MSK_QUICK_STOP == CTRL_QUICK_STOP) {
         push(EVT_REC_QUICKSTOP);
     }
-    if (ctrl_word & MSK_DISABLE_OP) {
-        push(EVT_REC_OP_DISABLE);
-    }
-    if (ctrl_word & MSK_ENABLE_OP) {
+    if (ctrl_word & MSK_ENABLE_OP == CTRL_ENABLE_OP) {
         push(EVT_REC_OP_ENABLE);
     }
-    if (ctrl_word & MSK_FAULT_RESET) {
+    if (ctrl_word & MSK_FAULT_RESET == CTRL_FAULT_RESET) {
         push(EVT_REC_FAULTRESET);
     }
     return FSM_ERR_OK;
@@ -100,13 +108,19 @@ fsm_err_t fsm_handle_evt(fsm_t fsm) {
             }
             break;
         
+        case EVT_FAULT:
+            fsm_set_state(fsm, STATE_FAULT_REAC);
+            queue_push(fsm_get_queue(fsm), EVT_FAULT_REAC);
+            goto set_status_ok;
+        
         case EVT_COMMS_ON:
             if (current_state & STATE_NOT_READY) {
                 if (comms_on_callback() == FSM_ERR_OK) {
                     fsm->system_online = SET;
                     fsm_set_state(fsm, STATE_SWITCH_DISABLED);
-                    goto set_status_ok;
+                    
                 }
+                goto set_status_ok;
             }
             break;
 
@@ -177,7 +191,7 @@ fsm_err_t fsm_handle_evt(fsm_t fsm) {
         
         case EVT_REC_FAULTRESET:
             if (current_state & STATE_FAULT) {
-                fsm_set_state(fsm, STATE_SWITCH_ON);
+                fsm_set_state(fsm, STATE_SWITCH_DISABLED);
                 goto set_status_ok;
             }
             break;

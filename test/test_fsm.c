@@ -2,9 +2,10 @@
 #include <stdio.h>
 
 #include "fsm.h"
+#include "test_trans.h"
 
 void setUp(void) {
-
+    
 }
 
 void tearDown(void) {
@@ -81,5 +82,8 @@ int main(void) {
     RUN_TEST(test_fsm_startup);
     RUN_TEST(test_fsm_queue_add);
     RUN_TEST(test_fsm_queue_overrun);
+
+    tests_fsm_trans_setup();
+    test_fsm_trans_all();
     UNITY_END();
 }

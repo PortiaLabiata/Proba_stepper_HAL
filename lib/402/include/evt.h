@@ -12,7 +12,8 @@ typedef enum {
     EVT_REC_QUICKSTOP,
     EVT_REC_FAULTRESET,
     EVT_REC_VOLTAGE_DISABLE,
-    EVT_FAULT_REAC
+    EVT_FAULT_REAC,
+    EVT_FAULT
 } fsm_event_t;
 
 #define EVT_MIN     EVT_NO_EVT

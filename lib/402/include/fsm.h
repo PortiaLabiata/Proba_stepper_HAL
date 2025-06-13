@@ -32,15 +32,21 @@ typedef enum {
     FSM_ERR_CB_FAILED
 } fsm_err_t;
 
-typedef enum {
-    MSK_SHUTDOWN =        0B00110,
-    MSK_SWITCHON =        0B00111,
-    MSK_DISABLE_VOLTAGE = 0B00000,
-    MSK_QUICK_STOP =      0B00010,
-    MSK_DISABLE_OP =      0B00111,
-    MSK_ENABLE_OP =       0B01111,
-    MSK_FAULT_RESET =     0B10000
-} ctrl_word_msk_t;
+
+#define MSK_SHUTDOWN            (uint16_t)0b10000111
+#define MSK_SWON_DISOP          (uint16_t)0b10001111
+#define MSK_DISABLE_VOLTAGE     (uint16_t)0b10000000
+#define MSK_QUICK_STOP          (uint16_t)0b10000010
+#define MSK_ENABLE_OP           (uint16_t)0b10001111
+#define MSK_FAULT_RESET         (uint16_t)0b10000000
+
+#define CTRL_SHUTDOWN           (uint16_t)0b00000110
+#define CTRL_SWON_DISOP         (uint16_t)0b00000111
+#define CTRL_DISABLE_VOLTAGE    (uint16_t)0b00001111
+#define CTRL_QUICK_STOP         (uint16_t)0b00000000
+#define CTRL_ENABLE_OP          (uint16_t)0b00000111
+#define CTRL_FAULT_RESET        (uint16_t)0b10000000
+
 
 typedef enum {
     MSK_STAT_NOT_READY =    0B1000000
@@ -53,6 +59,7 @@ typedef struct FSM *fsm_t;
 fsm_t fsm_create(void);
 uint32_t fsm_get_count(void);
 fsm_err_t fsm_start(fsm_t fsm);
+fsm_err_t fsm_purge(fsm_t fsm);
 
 fsm_err_t process_ctrl_word(fsm_t fsm, uint16_t ctrl_word);
 fsm_err_t fsm_handle_evt(fsm_t fsm);
