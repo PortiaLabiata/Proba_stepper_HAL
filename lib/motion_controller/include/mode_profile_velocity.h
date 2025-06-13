@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "proxy.h"
+#include "factor_group.h"
 
 #ifndef SET
 #define SET     (uint8_t)1

@@ -7,6 +7,7 @@ struct FSM {
     fsm_queue_t queue;
     uint8_t system_online;
     uint8_t quick_leave_allowed;
+    uint16_t status_word;
 };
 
 static struct FSM _fsm_pool[FSM_POOL_SIZE];
@@ -76,7 +77,24 @@ fsm_err_t process_ctrl_word(fsm_t fsm, uint16_t ctrl_word) {
 
 uint16_t process_status_word(fsm_t fsm) {
     switch (fsm_get_state(fsm)) {
-        
+        case STATE_NOT_READY:
+            return MSK_ST_SWICH_NOT_READY;
+        case STATE_SWITCH_DISABLED:
+            return MSK_ST_SWITCH_DISABLED;
+        case STATE_SWITCH_READY:
+            return MSK_ST_SWITCH_READY;
+        case STATE_SWITCH_ON:
+            return MSK_ST_SWITCH_ON;
+        case STATE_OP_ENABLED:
+            return MSK_ST_OP_ENABLED;
+        case STATE_QUICK_STOP:
+            return MSK_ST_QUICK_STOP;
+        case STATE_FAULT_REAC:
+            return MSK_ST_FAULT_REAC;
+        case STATE_FAULT:
+            return MSK_ST_FAULT;
+        default:
+            return 0;
     }
 }
 
@@ -252,6 +270,10 @@ fsm_err_t fsm_set_state(fsm_t fsm, fsm_state_t new_state) {
         return FSM_ERR_ILLSTATE;
     } else {
         fsm->state = new_state;
+        uint16_t new_status = process_status_word(fsm);
+        if (new_status != 0) {
+            fsm->status_word = new_status;
+        }
         return FSM_ERR_OK;
     }
 #else

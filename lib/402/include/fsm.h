@@ -33,6 +33,8 @@ typedef enum {
     FSM_ERR_ILLTRANS
 } fsm_err_t;
 
+#define sdo_idx_t uint8_t
+#define sdo_sub_idx uint8_t
 
 #define MSK_SHUTDOWN            (uint16_t)0b10000111
 #define MSK_SWON_DISOP          (uint16_t)0b10001111
@@ -58,10 +60,7 @@ typedef enum {
 #define MSK_ST_FAULT_REAC       (uint16_t)0b00001111
 #define MSK_ST_FAULT            (uint16_t)0b00001000
 
-
-typedef enum {
-    MSK_STAT_NOT_READY =    0B1000000
-} status_word_msk_t;
+#define IND_CONTROL_WORD        (sdo_idx_t)0x6040
 
 typedef struct FSM *fsm_t;
 
