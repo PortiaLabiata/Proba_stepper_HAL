@@ -57,6 +57,10 @@ uint16_t sps2arr(uint32_t sps) {
     return (uint16_t)vel_constrain(sps);
 }
 
+uint16_t vel2arr(int32_t vel, struct factor_group *f) {
+    return sps2arr(vel2sps(vel, f));
+}
+
 /* Acceleration to velocity calculation */
 
 int32_t vel_next_acc(int32_t vel, struct factor_group *f) {

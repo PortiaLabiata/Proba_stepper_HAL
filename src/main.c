@@ -14,7 +14,7 @@ CAN_HandleTypeDef hcan;
 
 CANopenNodeSTM32 canOpenNodeSTM32;
 Stepper_Handle_t *stp = NULL;
-extern const OD_t *OD;
+extern OD_t *OD;
 
 int main(void) {
     HAL_Init();

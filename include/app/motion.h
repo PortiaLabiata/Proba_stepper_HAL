@@ -4,6 +4,7 @@
 
 #include "fsm.h"
 #include "CO_app_STM32.h"
+#include "mode_profile_velocity.h"
 
 /* Global handles */
 

@@ -33,3 +33,18 @@ fsm_err_t drive_off_callback(void) {
 fsm_err_t power_cut_callback(void) {
     Stepper_Disable(stp);
 }
+
+/* Controller callbacks */
+
+void proxy_pv_tim_callback(void) {
+    proxy_pv_t p = proxy_pv_get_singleton();
+    if (proxy_pv_get_halt(p)) {
+        if (proxy_pv_get_dec_idx(p) < proxy_pv_get_dec_len(p)) {
+            Stepper_SetPeriod(proxy_pv_next_dec(p));
+        }
+    } else {
+        if (proxy_pv_get_acc_idx(p) < proxy_pv_get_acc_len(p)) {
+            Stepper_SetPeriod(proxy_pv_next_acc(p));
+        }
+    }
+}

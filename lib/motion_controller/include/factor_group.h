@@ -13,8 +13,6 @@
 #define DIM_IND_VEL_RPM     (uint8_t)0xA4
 #define DIM_IND_VEL_RPH     (uint8_t)0xA5
 
-#define fuck (int8_t)0xFF;
-
 struct factor_group {
     int8_t pos_notation_index;
     uint8_t pos_dimesion_index;
@@ -29,6 +27,7 @@ struct factor_group {
 
 uint32_t vel2sps(int32_t vel, struct factor_group *f);
 uint16_t sps2arr(uint32_t sps);
+uint16_t vel2arr(int32_t vel, struct factor_group *f);
 
 int32_t vel_next_acc(int32_t vel, struct factor_group *f);
 int32_t vel_next_dec(int32_t vel, struct factor_group *f);
