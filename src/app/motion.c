@@ -19,32 +19,23 @@ fsm_err_t comms_on_callback(void) {
     if (canopen_app_init(&canOpenNodeSTM32) != CO_ERROR_NO) {
         return FSM_ERR_CB_FAILED;
     }
+
     return FSM_ERR_OK;
 }
 
 fsm_err_t drive_on_callback(void) {
     Stepper_Enable(stp);
+    return FSM_ERR_OK;
 }
 
 fsm_err_t drive_off_callback(void) {
     Stepper_Disable(stp);
+    return FSM_ERR_OK;
 }
 
 fsm_err_t power_cut_callback(void) {
     Stepper_Disable(stp);
+    return FSM_ERR_OK;
 }
 
 /* Controller callbacks */
-
-void proxy_pv_tim_callback(void) {
-    proxy_pv_t p = proxy_pv_get_singleton();
-    if (proxy_pv_get_halt(p)) {
-        if (proxy_pv_get_dec_idx(p) < proxy_pv_get_dec_len(p)) {
-            Stepper_SetPeriod(proxy_pv_next_dec(p));
-        }
-    } else {
-        if (proxy_pv_get_acc_idx(p) < proxy_pv_get_acc_len(p)) {
-            Stepper_SetPeriod(proxy_pv_next_acc(p));
-        }
-    }
-}

@@ -8,111 +8,64 @@ struct proxy_pv {
     int32_t v_target;
     uint8_t halt;
 
-    int32_t ramp_acc[PV_RAMP_MAX_LEN];
-    int32_t ramp_dec[PV_RAMP_MAX_LEN];
-    uint8_t ramp_acc_len;
-    uint8_t ramp_dec_len;
-
-    uint8_t ramp_acc_idx;
-    uint8_t ramp_dec_idx;
-    struct factor_group *f;
+    struct factors *f;
+    struct params *p;
 };
 
 static struct proxy_pv _proxy; // Singleton
 static uint8_t _proxy_initialized = RESET; 
 
-/* Utility functions */
-
-void pv_ramp_acc_precalc(proxy_pv_t p) {
-    int32_t *vel = p->ramp_acc;
-    int32_t vel_target = p->v_target;
-    *vel = p->v_actual;
-    while (abs(*vel - vel_target)*100 / vel_target < VEL_REL_ALLOW) {
-        *vel = vel_next_acc(*vel, p->f); 
-        vel++;
-        p->ramp_acc_len++;
-    }
-}
-
-void pv_ramp_dec_precalc(proxy_pv_t p) {
-    int32_t *vel = p->ramp_dec;
-    int32_t vel_target = p->v_target;
-    *vel = p->v_actual;
-    while (abs(*vel - vel_target)*100 / vel_target < VEL_REL_ALLOW) {
-        *vel = vel_next_acc(*vel, p->f); 
-        vel++;
-        p->ramp_dec_len++;
-    }
-}
-
 /* OOP functions */
 
-proxy_pv_t proxy_pv_create(void) {
+proxy_pv_t pv_create(void) {
     if (_proxy_initialized) {
         return NULL;
     }
     return &_proxy;
 }
 
-proxy_pv_t proxy_pv_get_singleton(void) {
+void pv_destroy(void) {
+    _proxy_initialized = RESET;
+}
+
+proxy_pv_t pv_get_singleton(void) {
     return &_proxy;
 }
 
-proxy_err_t proxy_pv_init(proxy_pv_t p, struct factor_group *f) {
-    p->f = f;
-    p->halt = SET;
-    pv_ramp_acc_precalc(p);
-    pv_ramp_dec_precalc(p);
+proxy_err_t pv_init(proxy_pv_t proxy, struct factors *f ,struct params *p) {
+    proxy->f = f;
+    proxy->p = p;
     return PROXY_ERR_OK;
 }
 
-proxy_err_t proxy_pv_recalculate(proxy_pv_t p) {
-    pv_ramp_acc_precalc(p);
-    pv_ramp_dec_precalc(p);
-    return PROXY_ERR_OK;
+proxy_err_t pv_marshall(void) {
+
 }
 
-void proxy_pv_process_ctrl(proxy_pv_t p, uint16_t word) {
-    if (word & PV_HALT_MSK) {
-        p->halt = SET;
-    } else if (p->halt) {
-        p->halt = RESET;
+/* Trajectory generator functions */
+
+uint32_t limit_value(uint32_t value, uint32_t limit) {
+    if (value > limit) return value;
+    else return limit;
+}
+
+uint32_t pv_ramp_generate(int32_t v_curr, int32_t v_target, struct params *p, \
+     int32_t ramp[], uint8_t accelerate) {
+    if (v_target > p->max_profile_velocity) {
+        v_target = p->max_profile_velocity;
     }
-}
+    int32_t accel = 0; // Risk of overflow
+    if (accelerate) {
+        accel = limit_value(p->profile_acc, p->max_acceleration);
+    } else {
+        accel = -limit_value(p->profile_dec, p->max_deceleration);
+    }
 
-__WEAK void proxy_pv_tim_callback(void) {
-
-}
-
-/* Getters/setters */
-
-uint8_t proxy_pv_get_halt(proxy_pv_t p) {
-    return p->halt;
-}
-
-uint8_t proxy_pv_get_acc_idx(proxy_pv_t p) {
-    return p->ramp_acc_idx;
-}
-
-uint8_t proxy_pv_get_dec_idx(proxy_pv_t p) {
-    return p->ramp_dec_idx;
-}
-
-uint8_t proxy_pv_get_acc_len(proxy_pv_t p) {
-    return p->ramp_acc_len;
-}
-
-uint8_t proxy_pv_get_dec_len(proxy_pv_t p) {
-    return p->ramp_dec_len;
-}
-
-/* Iterators, so to speak */
-
-uint16_t proxy_pv_next_dec(proxy_pv_t p) {
-    return p->ramp_dec[p->ramp_dec_idx++];
-}
-
-uint16_t proxy_pv_next_acc(proxy_pv_t p) {
-    return p->ramp_acc[p->ramp_acc_idx++];
+    int i = 1;
+    while (!CHECK_ALLOW(v_curr, v_target, VEL_REL_ALLOW)) {
+        v_curr += accel;
+        ramp[i++] = v_curr;
+    }
+    return i;
 }
 

@@ -55,21 +55,21 @@ fsm_err_t fsm_purge(fsm_t fsm) {
 }
 
 fsm_err_t process_ctrl_word(fsm_t fsm, uint16_t ctrl_word) {
-    if (ctrl_word & MSK_SHUTDOWN == CTRL_SHUTDOWN) {
+    if ((ctrl_word & MSK_SHUTDOWN) == CTRL_SHUTDOWN) {
         push(EVT_REC_SHUTDOWN);
-    } else if (ctrl_word & MSK_SWON_DISOP == CTRL_SWON_DISOP) {
+    } else if ((ctrl_word & MSK_SWON_DISOP) == CTRL_SWON_DISOP) {
         if (fsm_get_state(fsm) == STATE_SWITCH_READY) {
             push(EVT_REC_SWITCHON);
         } else if (fsm_get_state(fsm) == STATE_OP_ENABLED) {
             push(EVT_REC_OP_DISABLE);
         }
-    } else if (ctrl_word & MSK_DISABLE_VOLTAGE == CTRL_DISABLE_VOLTAGE) {
+    } else if ((ctrl_word & MSK_DISABLE_VOLTAGE) == CTRL_DISABLE_VOLTAGE) {
         push(EVT_REC_VOLTAGE_DISABLE);
-    } else if (ctrl_word & MSK_QUICK_STOP == CTRL_QUICK_STOP) {
+    } else if ((ctrl_word & MSK_QUICK_STOP) == CTRL_QUICK_STOP) {
         push(EVT_REC_QUICKSTOP);
-    } else if (ctrl_word & MSK_ENABLE_OP == CTRL_ENABLE_OP) {
+    } else if ((ctrl_word & MSK_ENABLE_OP) == CTRL_ENABLE_OP) {
         push(EVT_REC_OP_ENABLE);
-    } else if (ctrl_word & MSK_FAULT_RESET == CTRL_FAULT_RESET) {
+    } else if ((ctrl_word & MSK_FAULT_RESET) == CTRL_FAULT_RESET) {
         push(EVT_REC_FAULTRESET);
     }
     return FSM_ERR_OK;
@@ -104,7 +104,10 @@ fsm_err_t fsm_handle_evt(fsm_t fsm) {
     }
 
     fsm_event_t event = EVT_NO_EVT;
-    queue_pop(fsm->queue, &event);
+
+    if (queue_pop(fsm->queue, &event) == QUEUE_ERR_UNDERRUN) {
+        return FSM_ERR_OK;
+    }
 
     fsm_state_t current_state = fsm_get_state(fsm);
     fsm_err_t status = FSM_ERR_ILLSTATE;

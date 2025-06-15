@@ -24,16 +24,24 @@ int main(void) {
     TIM3_Config();
 
     fsm_t fsm = fsm_create();
+    fsm_start(fsm);
     while (!fsm_is_online(fsm)) {
         fsm_handle_evt(fsm);
     }
 
+    uint16_t prev_ctrl = 0; // It's a stupid hack, but will work for now
+    // Afterthought: no it won't, because stupid ctrl words are the same for some commands
+    GET_CTRL_WORD(prev_ctrl);
     while (1) {
         canopen_app_process();
-        uint16_t control_word = 0;
-        OD_get_u16(OD_find(OD, IND_CONTROL_WORD), 0x00, &control_word, RESET);
-        
-        process_ctrl_word(fsm, control_word);
+        uint16_t ctrl = 0;
+        GET_CTRL_WORD(ctrl);
+
+        if (ctrl != prev_ctrl) {
+            prev_ctrl = ctrl;
+            process_ctrl_word(fsm, ctrl);
+        }
+
         fsm_handle_evt(fsm);
     }
 }

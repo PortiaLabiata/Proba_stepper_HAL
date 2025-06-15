@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <stdlib.h>
 #include "proxy.h"
 #include "factor_group.h"
 
@@ -19,6 +20,8 @@
 #define __WEAK  __attribute__((weak))
 #endif
 
+#define CHECK_ALLOW(__VALUE__, __TARGET__, __ALLOW__) abs(__VALUE__ - __TARGET__)*100 / __TARGET__ < __ALLOW__
+
 #define PV_RAMP_MAX_LEN     255
 #define PV_HALT_MSK         (1 << 8)
 
@@ -26,23 +29,12 @@ typedef struct proxy_pv *proxy_pv_t;
 
 /* Prototypes */
 
-void pv_ramp_acc_precalc(proxy_pv_t p);
-void pv_ramp_dec_precalc(proxy_pv_t p);
-proxy_pv_t proxy_pv_create(void);
-proxy_pv_t proxy_pv_get_singleton(void);
-proxy_err_t proxy_pv_init(proxy_pv_t p, struct factor_group *f);
-proxy_err_t proxy_pv_recalculate(proxy_pv_t p);
-void proxy_pv_process_ctrl(proxy_pv_t p, uint16_t word);
+/* OOP functions */
+proxy_pv_t pv_create(void);
+void pv_destroy(void);
+proxy_pv_t pv_get_singleton(void);
+proxy_err_t pv_init(proxy_pv_t proxy, struct factors *f ,struct params *p);
 
-__WEAK void proxy_pv_tim_callback(void);
-
-/* Getters/setters prototypes */
-
-uint8_t proxy_pv_get_halt(proxy_pv_t p);
-uint8_t proxy_pv_get_acc_idx(proxy_pv_t p);
-uint8_t proxy_pv_get_dec_idx(proxy_pv_t p);
-uint8_t proxy_pv_get_acc_len(proxy_pv_t p);
-uint8_t proxy_pv_get_dec_len(proxy_pv_t p);
-
-uint16_t proxy_pv_next_dec(proxy_pv_t p);
-uint16_t proxy_pv_next_acc(proxy_pv_t p);
+/* Calculation functions */
+uint32_t pv_ramp_generate(int32_t v_curr, int32_t v_target, struct params *p, \
+    int32_t ramp[], uint8_t accelerate);

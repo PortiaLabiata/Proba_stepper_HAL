@@ -8,3 +8,5 @@
 
 #define SET     (uint8_t)1
 #define RESET   (uint8_t)0
+
+#define GET_CTRL_WORD(__VAR__) OD_get_u16(OD_find(OD, IND_CONTROL_WORD), 0x00, &__VAR__, RESET);

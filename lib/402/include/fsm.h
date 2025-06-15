@@ -33,7 +33,7 @@ typedef enum {
     FSM_ERR_ILLTRANS
 } fsm_err_t;
 
-#define sdo_idx_t uint8_t
+#define sdo_idx_t uint16_t
 #define sdo_sub_idx uint8_t
 
 #define MSK_SHUTDOWN            (uint16_t)0b10000111
