@@ -43,17 +43,14 @@ int main(void) {
     };
     OD_extension_init(OD_find(OD, 0x6040), &ctrl_ext);
 
-    uint16_t prev_ctrl = 0; // It's a stupid hack, but will work for now
-    // Afterthought: no it won't, because stupid ctrl words are the same for some commands
-    GET_CTRL_WORD(prev_ctrl);
     while (1) {
         canopen_app_process();
-        uint16_t ctrl = 0;
-        GET_CTRL_WORD(ctrl);
 
         if (ctrl_word_modified) {
             ctrl_word_modified = RESET;
             HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+            uint16_t ctrl = 0;
+            GET_CTRL_WORD(ctrl);
             process_ctrl_word(fsm, ctrl);
         }
 
