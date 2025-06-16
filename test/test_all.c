@@ -24,11 +24,8 @@ int main(void) {
     tests_fsm_trans_setup();
     test_fsm_trans_all();
 
-    RUN_TEST(test_vel2sps_rps);
-    RUN_TEST(test_vel2sps_rpm);
-    RUN_TEST(test_vel2sps_rph);
-
-    RUN_TEST(test_vel2arr);
-    RUN_TEST(test_trapez);
+    RUN_TEST(test_pv_vel_any2rpm);
+    RUN_TEST(test_pv_acc_any2rpm2);
+    RUN_TEST(test_pv_ramp);
     UNITY_END();
 }

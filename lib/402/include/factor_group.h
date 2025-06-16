@@ -1,11 +1,6 @@
 #pragma once
 #include <inttypes.h>
 
-#define DEG_PER_STEP10    28
-#define STEP_PER_REV      360 * 10 / DEG_PER_STEP10
-#define VEL_SCALE_FACTOR  1
-#define VEL_REL_ALLOW     5
-
 #define DIM_IND_VEL_RPS     (uint8_t)0xA3
 #define DIM_IND_VEL_RPM     (uint8_t)0xA4
 #define DIM_IND_VEL_RPH     (uint8_t)0xA5

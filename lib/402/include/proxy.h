@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include "prefs.h"
 
 typedef enum {
     PROXY_ERR_OK,
