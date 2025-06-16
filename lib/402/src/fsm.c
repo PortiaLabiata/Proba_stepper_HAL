@@ -67,8 +67,12 @@ fsm_err_t process_ctrl_word(fsm_t fsm, uint16_t ctrl_word) {
         push(EVT_REC_VOLTAGE_DISABLE);
     } else if ((ctrl_word & MSK_QUICK_STOP) == CTRL_QUICK_STOP) {
         push(EVT_REC_QUICKSTOP);
-    } else if ((ctrl_word & MSK_ENABLE_OP) == CTRL_ENABLE_OP) {
-        push(EVT_REC_OP_ENABLE);
+    } else if ((ctrl_word & MSK_ENABLE_OP) == CTRL_SWON_ENOP) {
+        if (fsm_get_state(fsm) == STATE_SWITCH_READY) {
+            push(EVT_REC_SWITCHON_4BITS);
+        } else { // No illstate handling at this stage
+            push(EVT_REC_OP_ENABLE);
+        }
     } else if ((ctrl_word & MSK_FAULT_RESET) == CTRL_FAULT_RESET) {
         push(EVT_REC_FAULTRESET);
     }
@@ -156,6 +160,13 @@ fsm_err_t fsm_handle_evt(fsm_t fsm) {
         case EVT_REC_SWITCHON:
             if (current_state & STATE_SWITCH_READY) {
                 fsm_set_state(fsm, STATE_SWITCH_ON);
+                goto set_status_ok;
+            }
+            break;
+        
+        case EVT_REC_SWITCHON_4BITS:
+            if (current_state & STATE_SWITCH_READY) {
+                fsm_set_state(fsm, STATE_OP_ENABLED);
                 goto set_status_ok;
             }
             break;

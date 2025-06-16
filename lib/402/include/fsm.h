@@ -45,9 +45,9 @@ typedef enum {
 
 #define CTRL_SHUTDOWN           (uint16_t)0b00000110
 #define CTRL_SWON_DISOP         (uint16_t)0b00000111
+#define CTRL_SWON_ENOP          (uint16_t)0b00001111
 #define CTRL_DISABLE_VOLTAGE    (uint16_t)0b00001111
 #define CTRL_QUICK_STOP         (uint16_t)0b00000000
-#define CTRL_ENABLE_OP          (uint16_t)0b00000111
 #define CTRL_FAULT_RESET        (uint16_t)0b10000000
 
 #define MSK_STATUS_WORD         (uint16_t)0b01111111
