@@ -4,6 +4,14 @@
 #include "evt.h"
 #include "evt_queue.h"
 
+#ifndef SET
+#define SET (uint8_t)1
+#endif
+
+#ifndef RESET
+#define RESET (uint8_t)0
+#endif
+
 #ifndef __WEAK
 #define __WEAK __attribute__((weak))
 #endif
@@ -61,6 +69,7 @@ typedef enum {
 #define MSK_ST_FAULT            (uint16_t)0b00001000
 
 #define IND_CONTROL_WORD        (sdo_idx_t)0x6040
+#define IND_STATUS_WORD         (sdo_idx_t)0x6041
 
 typedef struct FSM *fsm_t;
 

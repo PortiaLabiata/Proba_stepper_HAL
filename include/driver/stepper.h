@@ -55,17 +55,23 @@ typedef struct Stepper_Handle Stepper_Handle_t;
 
 /* Prorotypes */
 
+/* OOP functions */
 Stepper_Handle_t *Stepper_Create(void);
 Stepper_Error_t Stepper_Init(Stepper_Handle_t *handle, GPIO_TypeDef *en_port, GPIO_TypeDef *dir_port,\
     GPIO_TypeDef *ms1_port, uint32_t en_msk, uint32_t dir_msk, uint32_t ms1_msk);
-void Stepper_ClockStart(void);
-Stepper_Error_t Stepper_SetPeriod(uint16_t period_ms);
-void Stepper_SetSteps(Stepper_Handle_t *handle, uint16_t steps);
-Stepper_Error_t Stepper_SetMode(Stepper_Handle_t *handle, Stepper_Mode_t mode);
 
+/* Getters/setters */
+Stepper_Error_t Stepper_SetPeriod(uint16_t period_mss);
+void Stepper_SetSteps(Stepper_Handle_t *handle, uint16_t steps);
+void Stepper_SetDir(Stepper_Handle_t *handle, Stepper_Dir_t dir);
+uint16_t Stepper_GetPeriod(void);
+Stepper_Error_t Stepper_SetMode(Stepper_Handle_t *handle, Stepper_Mode_t mode);
+uint8_t Stepper_IsEnabled(Stepper_Handle_t *handle);
+
+/* Control functions */
 void Stepper_Enable(Stepper_Handle_t *handle);
 void Stepper_Disable(Stepper_Handle_t *handle);
-uint8_t Stepper_IsEnabled(Stepper_Handle_t *handle);
+void Stepper_ClockStart(void);
 
 Stepper_Error_t Stepper_Rotate_IT(Stepper_Handle_t *handle, uint16_t steps, \
     Stepper_Dir_t direc);

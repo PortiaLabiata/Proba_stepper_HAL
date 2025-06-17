@@ -1,8 +1,9 @@
 #pragma once
 #include <stdint.h>
 #include <stdlib.h>
+
 #include "proxy.h"
-#include "factor_group.h"
+#include "driver/stepper.h"
 
 #ifndef SET
 #define SET     (uint8_t)1
@@ -20,11 +21,21 @@
 #define __WEAK  __attribute__((weak))
 #endif
 
-#define CHECK_ALLOW(__VALUE__, __TARGET__, __ALLOW__) abs(__VALUE__ - __TARGET__)*100 / __TARGET__ < __ALLOW__
-
 #define PV_HALT_MSK         (1 << 8)
 
+#define DIM_V_RPS           (uint8_t)0xA6
+#define DIM_V_RPM           (uint8_t)0xA4
+#define DIM_V_RPH           (uint8_t)0xA5
+
+/* Typedefs */
+
 typedef struct proxy_pv *proxy_pv_t;
+
+typedef enum {
+    PV_STATE_ACCEL,
+    PV_STATE_DECEL,
+    PV_STATE_MAINT
+} pv_state_t;
 
 /* Prototypes */
 
@@ -32,12 +43,21 @@ typedef struct proxy_pv *proxy_pv_t;
 proxy_pv_t pv_create(void);
 void pv_destroy(void);
 proxy_pv_t pv_get_singleton(void);
-proxy_err_t pv_init(proxy_pv_t proxy, struct factors *f ,struct params *p);
+proxy_err_t pv_init(proxy_pv_t proxy);
 
-int32_t vel_any2rpm(int32_t value, struct factors *f);
+/* Utilirary functions */
 
-int32_t acc_any2rpm2(int32_t value, struct factors *f);
+int32_t v2sps(int32_t v, uint8_t dim, int8_t not);
 
-/* Calculation functions */
-uint32_t pv_ramp_generate(int32_t v_curr, int32_t v_target, struct params *p, struct factors *f, \
-    int32_t ramp[], uint8_t accelerate);
+/* Getters/setters and data functions */
+int32_t pv_get_v_actual(proxy_pv_t pv);
+int32_t pv_get_v_demand(proxy_pv_t pv);
+int32_t pv_get_v_sensor_actual(proxy_pv_t pv);
+Stepper_Handle_t *pv_get_stepper(proxy_pv_t pv);
+
+void pv_set_v_target(proxy_pv_t pv, int32_t v_target);
+void pv_set_a_sps2(proxy_pv_t pv, uint32_t a_sps2);
+
+void pv_unmarshall(proxy_pv_t pv);
+void pv_marshall(proxy_pv_t pv);
+void pv_propagate(proxy_pv_t pv);

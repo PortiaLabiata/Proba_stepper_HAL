@@ -54,30 +54,45 @@ void Stepper_ClockStart(void) {
     htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Prescaler = HAL_RCC_GetPCLK1Freq() / 1000 - 1;
-    htim2.Init.Period = 10 - 1;
+    htim2.Init.Prescaler = HAL_RCC_GetPCLK1Freq() / 100 - 1;
+    htim2.Init.Period = 100 - 1;
     HAL_TIM_PWM_Init(&htim2);
 
     TIM_OC_InitTypeDef t1ch;
     t1ch.OCMode = TIM_OCMODE_PWM2;
     t1ch.OCPolarity = TIM_OCPOLARITY_HIGH;
     t1ch.OCFastMode = TIM_OCFAST_DISABLE;
-    t1ch.Pulse = 5;
+    t1ch.Pulse = 50;
     HAL_TIM_PWM_ConfigChannel(&htim2, &t1ch, TIM_CHANNEL_1);
     HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_1);
 }
 
-Stepper_Error_t Stepper_SetPeriod(uint16_t period_ms) {
-    if (period_ms < 7 || period_ms > 50) {
-        return STP_ERR_ILLVAL;
-    }
-    __HAL_TIM_SET_AUTORELOAD(&htim2, period_ms);
+Stepper_Error_t Stepper_SetPeriod(uint16_t period_mss) {
+    __HAL_TIM_SET_AUTORELOAD(&htim2, period_mss);
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, period_mss / 2);
     return STP_OK;
+}
+
+uint16_t Stepper_GetPeriod(void) {
+    return __HAL_TIM_GET_AUTORELOAD(&htim2);
 }
 
 void Stepper_SetSteps(Stepper_Handle_t *handle, uint16_t steps) {
     handle->steps_left = steps;
 }
+
+void Stepper_SetDir(Stepper_Handle_t *handle, Stepper_Dir_t dir) {
+    switch (dir) {
+        case STP_DIR_CLOCK:
+            STP_SETDIR_CLOCK(handle);
+            break;
+        case STP_DIR_COUNTER:
+            STP_SETDIR_COUNTER(handle);
+            break;
+        default:
+            return STP_ERR_ILLVAL;
+    }
+} 
 
 Stepper_Error_t Stepper_SetMode(Stepper_Handle_t *handle, Stepper_Mode_t mode) {
     switch (mode) {

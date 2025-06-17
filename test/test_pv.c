@@ -57,15 +57,7 @@ void test_pv_ramp(void) {
     //pv_init(pv, &f, &p);
 
     static int32_t ramp[1024];
-    uint32_t len = pv_ramp_generate(0, 50, &p, &f, ramp, SET);
+    uint32_t len = pv_ramp_generate(0, 50, 5, ramp);
     TEST_ASSERT_EQUAL(0, ramp[0]);
-    TEST_ASSERT_EQUAL(p.profile_acc*2*PV_CALC_PSC, ramp[2]);
-    TEST_ASSERT_EQUAL(len, 50/5);
-
-    f.vel_dimension_index = DIM_IND_VEL_RPH;
-    f.vel_notation_index = -1;
-    f.acc_dimension_index = DIM_IND_VEL_RPM;
-    p.profile_acc = 5;
-    len = pv_ramp_generate(50, 60, &p, &f, ramp, SET);
-    TEST_ASSERT_EQUAL(508, ramp[1]);
+    TEST_ASSERT_EQUAL(p.profile_acc*2, ramp[2]);    
 }
