@@ -89,8 +89,6 @@ void Stepper_SetDir(Stepper_Handle_t *handle, Stepper_Dir_t dir) {
         case STP_DIR_COUNTER:
             STP_SETDIR_COUNTER(handle);
             break;
-        default:
-            return STP_ERR_ILLVAL;
     }
 } 
 

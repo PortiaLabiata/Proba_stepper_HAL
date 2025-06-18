@@ -39,7 +39,7 @@ fsm_err_t fsm_start(fsm_t fsm) {
     fsm_set_state(fsm, STATE_START);
 
     fsm->system_online = RESET;
-    fsm->quick_leave_allowed = RESET;
+    fsm->quick_leave_allowed = SET;
 
     fsm->queue = queue_create();
     queue_init(fsm->queue);
@@ -68,11 +68,12 @@ fsm_err_t process_ctrl_word(fsm_t fsm, uint16_t ctrl_word) {
     } else if ((ctrl_word & MSK_QUICK_STOP) == CTRL_QUICK_STOP) {
         push(EVT_REC_QUICKSTOP);
     } else if ((ctrl_word & MSK_ENABLE_OP) == CTRL_SWON_ENOP) {
-        if (fsm_get_state(fsm) == STATE_SWITCH_READY) {
+        /* if (fsm_get_state(fsm) == STATE_SWITCH_READY) {
             push(EVT_REC_SWITCHON_4BITS);
         } else { // No illstate handling at this stage
             push(EVT_REC_OP_ENABLE);
-        }
+        } */
+       push(EVT_REC_OP_ENABLE);
     } else if ((ctrl_word & MSK_FAULT_RESET) == CTRL_FAULT_RESET) {
         push(EVT_REC_FAULTRESET);
     }
@@ -244,6 +245,7 @@ return_out:
     return status;
 }
 
+
 /* Callbacks */
 
 __WEAK fsm_err_t start_up_callback(void) {
@@ -298,6 +300,10 @@ fsm_err_t fsm_set_state(fsm_t fsm, fsm_state_t new_state) {
 
 uint8_t fsm_is_online(fsm_t fsm) {
     return fsm->system_online;
+}
+
+uint16_t fsm_get_statusword(fsm_t fsm) {
+    return fsm->status_word;
 }
 
 #if DEBUG_MODE

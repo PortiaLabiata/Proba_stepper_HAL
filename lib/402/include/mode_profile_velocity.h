@@ -34,7 +34,8 @@ typedef struct proxy_pv *proxy_pv_t;
 typedef enum {
     PV_STATE_ACCEL,
     PV_STATE_DECEL,
-    PV_STATE_MAINT
+    PV_STATE_MAINT,
+    PV_STATE_HALT
 } pv_state_t;
 
 /* Prototypes */
@@ -45,10 +46,6 @@ void pv_destroy(void);
 proxy_pv_t pv_get_singleton(void);
 proxy_err_t pv_init(proxy_pv_t proxy);
 
-/* Utilirary functions */
-
-int32_t v2sps(int32_t v, uint8_t dim, int8_t not);
-
 /* Getters/setters and data functions */
 int32_t pv_get_v_actual(proxy_pv_t pv);
 int32_t pv_get_v_demand(proxy_pv_t pv);
@@ -57,6 +54,7 @@ Stepper_Handle_t *pv_get_stepper(proxy_pv_t pv);
 
 void pv_set_v_target(proxy_pv_t pv, int32_t v_target);
 void pv_set_a_sps2(proxy_pv_t pv, uint32_t a_sps2);
+void pv_handle_ctrl_word(proxy_pv_t pv, uint16_t ctrl);
 
 void pv_unmarshall(proxy_pv_t pv);
 void pv_marshall(proxy_pv_t pv);

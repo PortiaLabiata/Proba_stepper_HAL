@@ -14,8 +14,6 @@ struct proxy_pv {
 
     Stepper_Handle_t *stepper; // Interface
     uint16_t a_sps2; // In
-    uint16_t v_sps;
-    uint16_t v_sps_prev;
 };
 
 static struct proxy_pv _proxy; // Singleton
@@ -87,8 +85,9 @@ void pv_set_a_sps2(proxy_pv_t pv, uint32_t a_sps2) {
 }
 
 void pv_propagate(proxy_pv_t pv) {
-    pv->v_sps = pv->v_target;
-    //pv->v_sps += pv->a_sps2 * 
+    if (pv->state != PV_STATE_HALT) {
+        pv->v_demand = pv->v_target; // Change when ramps added
+    }
 }
 
 void pv_marshall(proxy_pv_t pv) {
@@ -97,25 +96,22 @@ void pv_marshall(proxy_pv_t pv) {
     } else {
         Stepper_SetDir(pv->stepper, STP_DIR_COUNTER);
     }
-    Stepper_SetPeriod(10000 / pv->v_sps);
+    Stepper_SetPeriod(10000 / pv->v_demand);
 }
 
 void pv_unmarshall(proxy_pv_t pv) {
-    pv->v_actual = 10000 / Stepper_GetPeriod(); // Magic number :(
-    pv->v_sensor_actual = 10000 / Stepper_GetPeriod();
+    pv->v_actual = 10000 / pv->v_demand; // Magic number :(
+    pv->v_sensor_actual = 10000 / pv->v_demand;
+}
+
+void pv_handle_ctrl_word(proxy_pv_t pv, uint16_t ctrl) {
+    if (ctrl & PV_HALT_MSK) {
+        pv->v_demand = 0;
+        pv->state = PV_STATE_HALT;
+    } else {
+        pv->v_demand = pv->v_target;
+        pv->state = PV_STATE_MAINT;
+    }
 }
 
 /* Callbacks */
-
-void pv_tim_callback(void) {
-    proxy_pv_t pv = pv_get_singleton();
-    switch (pv->state) {
-        case PV_STATE_MAINT:
-            break;
-        case PV_STATE_ACCEL:
-            Stepper_SetPeriod(Stepper_GetPeriod() + pv->a_sps2);
-            break;
-        case PV_STATE_DECEL:
-            Stepper_SetPeriod(Stepper_GetPeriod() - pv->a_sps2);
-    }
-}

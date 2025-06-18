@@ -15,10 +15,10 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="project.xdd" fileCreator="Ilya Filippov" fileCreationDate="2025-06-13" fileCreationTime="15:27:50.0000000+03:00" fileModifiedBy="" fileModificationDate="2025-06-16" fileModificationTime="03:17:35.1417280+03:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="project.xdd" fileCreator="Ilya Filippov" fileCreationDate="2025-06-13" fileCreationTime="15:27:50.0000000+03:00" fileModifiedBy="" fileModificationDate="2025-06-18" fileModificationTime="12:11:01.6472780+03:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>PROBA</q1:vendorName>
-        <q1:vendorID>0</q1:vendorID>
+        <q1:vendorID>9999</q1:vendorID>
         <q1:productName>PROBA z-axis stepper drive</q1:productName>
         <q1:productID>1</q1:productID>
         <q1:version versionType="SW">0</q1:version>
@@ -2040,7 +2040,7 @@ The life time factor multiplied with the guard time gives the life time for the 
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="project.xdd" fileCreator="Ilya Filippov" fileCreationDate="2025-06-13" fileCreationTime="15:27:50.0000000+03:00" fileModificationDate="2025-06-16" fileModificationTime="03:17:35.1417280+03:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="project.xdd" fileCreator="Ilya Filippov" fileCreationDate="2025-06-13" fileCreationTime="15:27:50.0000000+03:00" fileModificationDate="2025-06-18" fileModificationTime="12:11:01.6472780+03:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />

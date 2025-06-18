@@ -4,6 +4,7 @@
 #include "mode_profile_velocity.h"
 
 #include "OD.h"
+#include "CO_app_STM32.h"
 
 /* Typedefs */
 

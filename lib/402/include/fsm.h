@@ -86,6 +86,7 @@ fsm_err_t fsm_handle_evt(fsm_t fsm);
 fsm_state_t fsm_get_state(fsm_t fsm);
 fsm_err_t fsm_set_state(fsm_t fsm, fsm_state_t new_state);
 uint8_t fsm_is_online(fsm_t fsm);
+uint16_t fsm_get_statusword(fsm_t fsm);
 
 __WEAK fsm_err_t start_up_callback(void);
 __WEAK fsm_err_t comms_on_callback(void);

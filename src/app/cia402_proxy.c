@@ -82,7 +82,7 @@ cia402_err_t cia402_init(cia402_t cia, OD_t *od) {
 }
 
 /* Control functions */
-
+// Move marshall/unmarshall to write/read OD functions
 cia402_err_t cia402_process(cia402_t cia) {
     cia402_unmarshall(cia);
     cia402_marshall(cia);
@@ -90,8 +90,10 @@ cia402_err_t cia402_process(cia402_t cia) {
         HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
         cia->cmd_pending = RESET;
         process_ctrl_word(cia->fsm, cia->ctrl_word);
+        pv_handle_ctrl_word(cia->pv, cia->ctrl_word);
     }
     fsm_handle_evt(cia->fsm);
+    return CIA402_ERR_OK;
 }
 
 /* Data functions */
@@ -141,6 +143,7 @@ static ODR_t watching_write(OD_stream_t *stream, const void *buf, OD_size_t coun
 fsm_err_t drive_on_callback(void) {
     cia402_t cia = cia402_get_singleton();
     Stepper_Enable(pv_get_stepper(cia->pv));
+    return FSM_ERR_OK;
 }
 
 fsm_err_t drive_off_callback(void) {
@@ -150,5 +153,13 @@ fsm_err_t drive_off_callback(void) {
 }
 
 fsm_err_t power_cut_callback(void) {
+    cia402_t cia = cia402_get_singleton();
+    Stepper_Disable(pv_get_stepper(cia->pv));
+    return FSM_ERR_OK;
+}
+
+fsm_err_t quick_stop_callback(void) {
+    cia402_t cia = cia402_get_singleton();
+    Stepper_Disable(pv_get_stepper(cia->pv));
     return FSM_ERR_OK;
 }
