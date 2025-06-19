@@ -33,13 +33,24 @@ typedef enum {
 #define IND_MAX_ACC         (uint16_t)0x60C5
 #define IND_MAX_DEC         (uint16_t)0x60C6
 
+#define IND_MODES_OP        (uint16_t)0x6060
+#define IND_MODES_OP_DISP   (uint16_t)0x6061
+
+#define MODE_PP             (uint8_t)1
+#define MODE_VM             (uint8_t)2
+#define MODE_PV             (uint8_t)3
+#define MODE_PT             (uint8_t)4
+#define MODE_HM             (uint8_t)6
+#define MODE_IP             (uint8_t)7
+
 /* Macros */
 
 #define OD_DEFAULT          cia->od
 #define OD_READ(__IND__, __OUT__, __TYPE__) OD_get_##__TYPE__(OD_find(OD_DEFAULT, __IND__), 0x00, __OUT__, RESET)
 #define OD_WRITE(__IND__, __IN__, __TYPE__) OD_set_##__TYPE__(OD_find(OD_DEFAULT, __IND__), 0x00, __IN__, RESET)
-#define OD_READ_CTRL(__OUT__) OD_get_u16(OD_find(OD_DEFAULT, IND_CONTROL_WORD), 0x00, __OUT__, RESET);
+#define OD_READ_CTRL(__OUT__) OD_get_u16(OD_find(OD_DEFAULT, IND_CONTROL_WORD), 0x00, __OUT__, RESET)
 #define OD_WRITE_STATUS(__IN__) OD_set_u16(OD_find(OD_DEFAULT, IND_STATUS_WORD), 0x00, __IN__, RESET)
+#define OD_SET_PV_MODE() OD_set_u8(OD_find(OD_DEFAULT, IND_MODES_OP_DISP), 0x00, MODE_PV, RESET)
 
 /* OOP functions */
 

@@ -15,6 +15,9 @@ int main(void) {
     GPIO_Config();
     TIM2_Config();
     TIM3_Config();
+    GPIOC->BSRR |= GPIO_BSRR_BS13;
+    HAL_Delay(300);
+    GPIOC->BSRR |= GPIO_BSRR_BR13;
 
     cia402_t cia = cia402_create();
     cia402_init(cia, OD);

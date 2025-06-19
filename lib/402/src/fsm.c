@@ -286,7 +286,7 @@ fsm_err_t fsm_set_state(fsm_t fsm, fsm_state_t new_state) {
         return FSM_ERR_ILLSTATE;
     } else {
         fsm->state = new_state;
-        uint16_t new_status = process_status_word(fsm);
+        uint16_t new_status = (fsm->status_word & ~MSK_STATUS_WORD) | process_status_word(fsm);
         if (new_status != 0) {
             fsm->status_word = new_status;
         }

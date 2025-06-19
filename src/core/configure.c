@@ -15,13 +15,13 @@ void ClockConfig(void) {
     // it corresponds to HSI/2. f=48MHz
     // Settings: PLL as SYSCLK clock source, PLLMUL=12, ADC PSC=4.
 
-    RCC->CFGR |= RCC_CFGR_ADCPRE_DIV4 | RCC_CFGR_SW_PLL | RCC_CFGR_PLLMULL12;
+    FLASH->ACR |= FLASH_ACR_LATENCY_2; // Enable flash latency
+    RCC->CFGR |= RCC_CFGR_ADCPRE_DIV4 | RCC_CFGR_PPRE1_DIV2 | RCC_CFGR_SW_PLL | RCC_CFGR_PLLMULL16;
     RCC->CR |= RCC_CR_PLLON; // Starting PLL
     while (!(RCC->CR & RCC_CR_PLLRDY)) 
         __NOP();
     while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) 
         __NOP();
-    FLASH->ACR |= FLASH_ACR_LATENCY_2; // Enable flash latency
     SystemCoreClockUpdate();
 
     NVIC_SetPriorityGrouping(4);
@@ -89,7 +89,7 @@ void CAN_Config(void) {
   hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
   hcan.Init.TimeSeg1 = CAN_BS1_13TQ;  // 13 + 2 + 1 = 16 TQs
   hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
-  hcan.Init.Prescaler = 24;
+  hcan.Init.Prescaler = 16;
   hcan.Init.AutoBusOff = DISABLE;
   hcan.Init.AutoWakeUp = DISABLE;
   HAL_CAN_Init(&hcan);

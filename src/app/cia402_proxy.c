@@ -78,6 +78,7 @@ cia402_err_t cia402_init(cia402_t cia, OD_t *od) {
     pv_init(cia->pv);
     extension_ctrl.object = od;
     OD_extension_init(OD_find(od, IND_CONTROL_WORD), &extension_ctrl);
+    OD_SET_PV_MODE(); // Stub for now
     return CIA402_ERR_OK;
 }
 
@@ -98,7 +99,7 @@ cia402_err_t cia402_process(cia402_t cia) {
 
 /* Data functions */
 
-void cia402_marshall(cia402_t cia) {
+void cia402_unmarshall(cia402_t cia) {
     /* Parameters */
     OD_READ(IND_VEL_TARGET, &cia->p.v_target, i32);
 
@@ -109,9 +110,6 @@ void cia402_marshall(cia402_t cia) {
     OD_READ(IND_MAX_ACC, &cia->p.a_max, u32);
     OD_READ(IND_MAX_DEC, &cia->p.d_max, u32);
     */
-    pv_set_v_target(cia->pv, cia->p.v_target);
-    pv_propagate(cia->pv);
-    pv_marshall(cia->pv);
     // pv_set_a_sps2(cia->pv, smth);
 
     /* Factors */
@@ -126,10 +124,14 @@ void cia402_marshall(cia402_t cia) {
     */
 }
 
-void cia402_unmarshall(cia402_t cia) {
+void cia402_marshall(cia402_t cia) {
     pv_unmarshall(cia->pv);
     OD_WRITE(IND_VEL_ACTUAL, pv_get_v_actual(cia->pv), i32);
-    OD_WRITE_STATUS(cia->status_word);
+    OD_WRITE_STATUS(fsm_get_statusword(cia->fsm));
+
+    pv_set_v_target(cia->pv, cia->p.v_target);
+    pv_propagate(cia->pv);
+    pv_marshall(cia->pv);
 }
 
 static ODR_t watching_write(OD_stream_t *stream, const void *buf, OD_size_t count, OD_size_t *countWritten) {

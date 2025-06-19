@@ -81,6 +81,7 @@ fsm_err_t fsm_start(fsm_t fsm);
 fsm_err_t fsm_purge(fsm_t fsm);
 
 fsm_err_t process_ctrl_word(fsm_t fsm, uint16_t ctrl_word);
+uint16_t process_status_word(fsm_t fsm);
 fsm_err_t fsm_handle_evt(fsm_t fsm);
 
 fsm_state_t fsm_get_state(fsm_t fsm);
